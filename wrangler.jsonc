@@ -1,8 +1,0 @@
-{
-  "name": "testa",
-  "compatibility_date": "2026-06-27",
-  "assets": {
-    "directory": "./",
-    "not_found_handling": "single-page-application"
-  }
-}
