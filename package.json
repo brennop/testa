@@ -1,0 +1,21 @@
+{
+  "name": "testa",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^8.1.0"
+  },
+  "dependencies": {
+    "motion": "^12.42.0",
+    "navaid": "^1.2.0",
+    "petite-vue": "^0.4.1",
+    "y-webrtc": "^10.3.0",
+    "yjs": "^13.6.31"
+  }
+}

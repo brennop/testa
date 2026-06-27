@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>testa</title>
+    <script type="module">
+      import navaid from "navaid";
+      import * as Y from "yjs";
+      import { WebrtcProvider } from "y-webrtc";
+      import { createApp, reactive } from "petite-vue";
+
+      navaid()
+        .on("/:room", (params) => {
+          const doc = new Y.Doc();
+          const provider = new WebrtcProvider("testa-" + params.room, doc, {
+            signaling: ["wss://yjs.brennn.in"],
+          });
+          const people = doc.get("people", Y.Map);
+
+          const state = reactive({
+            people: Object.fromEntries(people.entries()),
+            get sortedPeople() {
+              return Object.entries(this.people).sort(([a], [b]) => a.localeCompare(b))
+            },
+            setField(key, value) {
+              people.set(key, value);
+            },
+          });
+
+          people.observe((event) => {
+            event.changes.keys.forEach((_, key) => {
+              state.people[key] = people.get(key);
+            });
+          });
+
+          createApp(state).mount();
+
+          state.me = window.prompt("seu nome");
+          people.set(state.me, "");
+        })
+        .listen();
+    </script>
+  </head>
+  <body>
+    <div id="app" v-scope>
+      <ul>
+        <li v-for="[name, value] in sortedPeople" :key="name">
+          <label :for="name">{{ name }}</label>
+          <input
+            :id="name"
+            :name="name"
+            :value="name === me ? '?????' : value"
+            @input="setField(name, $event.target.value)"
+            :disabled="name === me"
+          />
+        </li>
+      </ul>
+    </div>
+  </body>
+</html>
