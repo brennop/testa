@@ -5,60 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>testa</title>
     <script type="module">
-      import navaid from "https://esm.sh/navaid";
       import * as Y from "https://esm.sh/yjs";
       import { WebrtcProvider } from "https://esm.sh/y-webrtc";
       import { createApp, reactive } from "https://unpkg.com/petite-vue?module";
 
-      navaid()
-        .on("/:room", (params) => {
-          const doc = new Y.Doc();
-          const provider = new WebrtcProvider("testa-" + params.room, doc, {
-            signaling: ["wss://yjs.brennn.in"],
-          });
-          const people = doc.get("people", Y.Map);
+      const doc = new Y.Doc();
+      const people = doc.get("people", Y.Map);
 
-          const state = reactive({
-            people: Object.fromEntries(people.entries()),
-            get sortedPeople() {
-              return Object.entries(this.people).sort(([a], [b]) => a.localeCompare(b))
-            },
-            get editIndex() {
-              return (this.sortedPeople.findIndex(([name]) => name === this.me) + 1) % this.sortedPeople.length
-            },
-            setField(key, value) {
-              people.set(key, value);
-            },
-          });
+      const state = reactive({
+        people: Object.fromEntries(people.entries()),
+        get sortedPeople() { return Object.entries(this.people).sort(([a], [b]) => a.localeCompare(b)) },
+        get editIndex() { return (this.sortedPeople.findIndex(([name]) => name === this.me) + 1) % this.sortedPeople.length },
+        setField(key, value) { people.set(key, value) },
+      });
 
-          people.observe((event) => {
-            event.changes.keys.forEach((_, key) => {
-              state.people[key] = people.get(key);
-            });
-          });
+      people.observe((event) => event.changes.keys.forEach((_, key) => state.people[key] = people.get(key)));
 
-          createApp(state).mount();
+      createApp(state).mount();
 
-          state.me = window.prompt("seu nome");
-          people.set(state.me, "");
-        })
-        .listen();
+      new WebrtcProvider("testa-" + window.prompt("sala"), doc, { signaling: ["wss://yjs.brennn.in"] });
+
+      state.me = window.prompt("seu nome");
+      people.set(state.me, "");
     </script>
   </head>
   <body>
-    <div id="app" v-scope>
-      <ul>
-        <li v-for="([name, value], index) in sortedPeople" :key="name">
-          <label :for="name">{{ name }}</label>
-          <input
-            :id="name"
-            :name="name"
-            :value="name === me ? '?????' : value"
-            @input="setField(name, $event.target.value)"
-            :disabled="index !== editIndex"
-          />
-        </li>
-      </ul>
-    </div>
+    <ul id="app" v-scope>
+      <li v-for="([name, value], index) in sortedPeople" :key="name">
+        <label :for="name">{{ name }}</label>
+        <input :id="name" :name="name" :value="name === me ? '?????' : value" @input="setField(name, $event.target.value)" :disabled="index !== editIndex" />
+      </li>
+    </ul>
   </body>
 </html>
