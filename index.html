@@ -23,6 +23,9 @@
             get sortedPeople() {
               return Object.entries(this.people).sort(([a], [b]) => a.localeCompare(b))
             },
+            get editIndex() {
+              return (this.sortedPeople.findIndex(([name]) => name === this.me) + 1) % this.sortedPeople.length
+            },
             setField(key, value) {
               people.set(key, value);
             },
@@ -45,14 +48,14 @@
   <body>
     <div id="app" v-scope>
       <ul>
-        <li v-for="[name, value] in sortedPeople" :key="name">
+        <li v-for="([name, value], index) in sortedPeople" :key="name">
           <label :for="name">{{ name }}</label>
           <input
             :id="name"
             :name="name"
             :value="name === me ? '?????' : value"
             @input="setField(name, $event.target.value)"
-            :disabled="name === me"
+            :disabled="index !== editIndex"
           />
         </li>
       </ul>
