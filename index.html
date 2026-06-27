@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>testa</title>
+    <style>
+      body { display: flex; gap: 1rem; }
+    </style>
     <script type="module">
       import * as Y from "https://esm.sh/yjs";
       import { WebrtcProvider } from "https://esm.sh/y-webrtc";
@@ -23,7 +26,7 @@
 
       createApp(state).mount();
 
-      new WebrtcProvider("testa-" + window.prompt("sala"), doc, { signaling: ["wss://yjs.brennn.in"] });
+      new WebrtcProvider("testa-" + new URLSearchParams(window.location.search).get('room'), doc, { signaling: ["wss://yjs.brennn.in"] });
 
       state.me = window.prompt("seu nome");
       people.set(state.me, "");
@@ -32,9 +35,15 @@
   <body>
     <ul id="app" v-scope>
       <li v-for="([name, value], index) in sortedPeople" :key="name">
-        <label :for="name">{{ name }}</label>
-        <input :id="name" :name="name" :value="name === me ? '?????' : value" @input="setField(name, $event.target.value)" :disabled="index !== editIndex" />
+        <label>
+          {{ name }}
+          <input :id="name" :name="name" :value="name === me ? '?????' : value" @input="setField(name, $event.target.value)" :disabled="index !== editIndex" />
+        </label>
       </li>
     </ul>
+    <label>
+      notas
+      <textarea></textarea>
+    </label>
   </body>
 </html>
